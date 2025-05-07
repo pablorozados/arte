@@ -46,68 +46,93 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Função para calcular e definir a cor de fundo
-    function setBackgroundColor() {
-      const now = new Date();
-      const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-      const r = (secondsInDay * 37) % 256;
-      const g = (secondsInDay * 59) % 256;
-      const b = (secondsInDay * 83) % 256;
-      document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    // Mapeamento de letras/sílabas para formas
+    const shapeMap = {
+      a: 'circle',
+      b: 'square',
+      c: 'triangle',
+      ba: 'star',
+      ca: 'hexagon',
+      // Adicione mais mapeamentos aqui
+    };
+
+    // Função para calcular uma posição determinística com base na letra/sílaba
+    function calculatePosition(char, index) {
+      const hash = char.charCodeAt(0) + index * 31;
+      const x = (hash % canvas.width);
+      const y = (hash % canvas.height);
+      return { x, y };
     }
 
-    // Função para desenhar triângulos
-    function drawTriangle(x, y, size, color) {
+    // Função para desenhar formas
+    function drawShape(type, x, y, size, color) {
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x, y - size / 2);
-      ctx.lineTo(x - size / 2, y + size / 2);
-      ctx.lineTo(x + size / 2, y + size / 2);
-      ctx.closePath();
+      if (type === 'circle') {
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+      } else if (type === 'square') {
+        ctx.rect(x - size / 2, y - size / 2, size, size);
+      } else if (type === 'triangle') {
+        ctx.moveTo(x, y - size / 2);
+        ctx.lineTo(x - size / 2, y + size / 2);
+        ctx.lineTo(x + size / 2, y + size / 2);
+        ctx.closePath();
+      } else if (type === 'star') {
+        for (let i = 0; i < 5; i++) {
+          const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+          const outerX = x + Math.cos(angle) * size;
+          const outerY = y + Math.sin(angle) * size;
+          ctx.lineTo(outerX, outerY);
+          const innerAngle = angle + Math.PI / 5;
+          const innerX = x + Math.cos(innerAngle) * (size / 2);
+          const innerY = y + Math.sin(innerAngle) * (size / 2);
+          ctx.lineTo(innerX, innerY);
+        }
+        ctx.closePath();
+      } else if (type === 'hexagon') {
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI * 2 * i) / 6;
+          const hexX = x + Math.cos(angle) * size;
+          const hexY = y + Math.sin(angle) * size;
+          if (i === 0) ctx.moveTo(hexX, hexY);
+          else ctx.lineTo(hexX, hexY);
+        }
+        ctx.closePath();
+      }
       ctx.fill();
     }
 
     // Função para gerar arte
     function generateArt() {
-      // Atualiza a cor de fundo ao clicar no botão
-      setBackgroundColor();
-
-      const input = document.getElementById('user-input').value;
+      const input = document.getElementById('user-input').value.toLowerCase();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      let index = 0;
+      while (index < input.length) {
+        let match = null;
 
-      [...input].forEach((char, index) => {
-        const isVowel = 'aeiouAEIOU'.includes(char);
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const size = Math.random() * 50 + 10;
-
-        // Define cores baseadas no caractere
-        const color = isVowel
-          ? `rgba(${Math.random() * 255}, 100, 150, 0.7)` // Tons quentes para vogais
-          : `rgba(100, ${Math.random() * 255}, 200, 0.7)`; // Tons frios para consoantes
-
-        if (isVowel) {
-          // Movimenta formas para quadrantes e adiciona círculos
-          const quadrant = index % 4;
-          const offsetX = quadrant === 0 || quadrant === 3 ? -100 : 100;
-          const offsetY = quadrant === 0 || quadrant === 1 ? -100 : 100;
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.arc(centerX + offsetX, centerY + offsetY, size, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          // Alterna entre quadrados e triângulos para consoantes
-          if (index % 2 === 0) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, size, size);
-          } else {
-            drawTriangle(x, y, size, color);
+        // Verifica se há uma sílaba correspondente
+        for (const key in shapeMap) {
+          if (input.startsWith(key, index)) {
+            match = key;
+            break;
           }
         }
-      });
+
+        // Se não houver sílaba correspondente, usa a letra
+        if (!match) {
+          match = input[index];
+        }
+
+        const shapeType = shapeMap[match] || 'circle'; // Forma padrão: círculo
+        const { x, y } = calculatePosition(match, index);
+        const size = 30 + (match.length * 10); // Tamanho baseado no comprimento da sílaba/letra
+        const color = `hsl(${(match.charCodeAt(0) * 37) % 360}, 70%, 60%)`; // Cor baseada no código da letra
+
+        drawShape(shapeType, x, y, size, color);
+
+        index += match.length; // Avança o índice pelo comprimento da sílaba/letra
+      }
     }
   </script>
 </body>

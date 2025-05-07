@@ -71,41 +71,39 @@
     // Função para calcular a posição determinística com base na letra/sílaba
     function calculatePosition(char, index) {
       const hash = char.charCodeAt(0) + index * 31;
-      const x = (hash % canvas.width);
-      const y = (hash % canvas.height);
+      const x = (hash * 37) % canvas.width; // Posição mais espalhada
+      const y = (hash * 53) % canvas.height;
       return { x, y };
     }
 
-    // Função para desenhar formas abstratas com linhas
+    // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
 
       let currentX = canvas.width / 2; // Começa no centro
       let currentY = canvas.height / 2;
 
-      for (let i = 0; i < input.length; i += 2) {
-        const syllable = input.slice(i, i + 2).toLowerCase(); // Pega duas letras (sílabas)
-        const consonant = syllable[0];
-        const vowel = syllable[1];
-
-        const size = calculateSize(vowel); // Calcula o tamanho baseado na vogal
-        const lineWidth = calculateLineWidth(vowel); // Calcula a grossura do traço
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i].toLowerCase();
+        const size = calculateSize(char); // Calcula o tamanho baseado na vogal
+        const lineWidth = calculateLineWidth(char); // Calcula a grossura do traço
         ctx.lineWidth = lineWidth;
 
-        const { x, y } = calculatePosition(consonant, i); // Posição baseada na sílaba
+        const { x, y } = calculatePosition(char, i); // Posição baseada no caractere
 
-        // Move ou desenha linhas com base na sílaba
-        if ("bdglnstz".includes(consonant)) {
-          // Sílabas que afetam ctx.moveTo()
-          currentX = x;
-          currentY = y;
-          ctx.moveTo(currentX, currentY);
-        } else if ("cfjkmnpqrvwz".includes(consonant)) {
-          // Sílabas que afetam ctx.lineTo()
-          currentX = x;
-          currentY = y;
-          ctx.lineTo(currentX, currentY);
+        // Alterna entre diferentes tipos de linhas e curvas
+        if (i % 3 === 0) {
+          ctx.lineTo(x, y); // Linha reta
+        } else if (i % 3 === 1) {
+          ctx.quadraticCurveTo(currentX, currentY, x, y); // Curva quadrática
+        } else {
+          const controlX = (currentX + x) / 2 + Math.random() * size - size / 2;
+          const controlY = (currentY + y) / 2 + Math.random() * size - size / 2;
+          ctx.bezierCurveTo(controlX, controlY, x, y, x + size / 2, y + size / 2); // Curva Bézier
         }
+
+        currentX = x;
+        currentY = y;
       }
 
       // Define uma cor aleatória para as linhas
@@ -137,5 +135,4 @@
   </script>
 </body>
 </html>
-``` 
 

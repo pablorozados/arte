@@ -46,6 +46,7 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    // Função para calcular e definir a cor de fundo
     function setBackgroundColor() {
       const now = new Date();
       const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
@@ -55,6 +56,7 @@
       document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
     }
 
+    // Função para desenhar triângulos
     function drawTriangle(x, y, size, color) {
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -65,7 +67,11 @@
       ctx.fill();
     }
 
+    // Função para gerar arte
     function generateArt() {
+      // Atualiza a cor de fundo ao clicar no botão
+      setBackgroundColor();
+
       const input = document.getElementById('user-input').value;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -103,8 +109,6 @@
         }
       });
     }
-
-    setBackgroundColor();
   </script>
 </body>
 </html>

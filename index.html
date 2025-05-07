@@ -177,6 +177,27 @@
       ctx.fill();
     }
 
+    // Função para desenhar um coração
+    function drawHeart() {
+      // Preenche a tela de branco
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Desenha o coração vermelho
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      const x = canvas.width / 2; // Centro horizontal
+      const y = canvas.height / 2; // Centro vertical
+      const size = 150; // Tamanho do coração
+
+      // Fórmula para desenhar o coração
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x - size / 2, y - size / 2, x - size * 1.5, y + size / 3, x, y + size);
+      ctx.bezierCurveTo(x + size * 1.5, y + size / 3, x + size / 2, y - size / 2, x, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
@@ -222,6 +243,11 @@
         // Verifica se é um ponto de exclamação ou interrogação
         else if (char === "!" || char === "?") {
           hasSpecialChar = true;
+        }
+        // Verifica se o input é "Ane" para exibir o coração
+        else if (input.trim().toLowerCase() === "ane") {
+          drawHeart();
+          return; // Para a execução do restante do desenho
         }
         // Verifica se é uma letra acentuada
         else if ("áéíóúâêîôûãõàèìòù".includes(char)) {
@@ -291,4 +317,5 @@
   </script>
 </body>
 </html>
+``` 
 

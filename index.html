@@ -200,12 +200,6 @@
 
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
-      // Verifica se o input é "Pablo" para exibir a frase
-      if (input.trim().toLowerCase() === "pablo") {
-        drawEasterEgg();
-        return; // Para a execução do restante do desenho
-      }
-
       ctx.beginPath();
 
       let currentX = canvas.width / 2; // Começa no centro
@@ -313,8 +307,15 @@
     function generateArt() {
       setBackgroundColor(); // Atualiza a cor de fundo
 
-      const input = document.getElementById('user-input').value.toLowerCase();
+      const input = document.getElementById('user-input').value.trim().toLowerCase();
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
+
+      // Verifica se o input é "Pablo" para exibir a frase
+      if (input === "pablo") {
+        drawEasterEgg();
+        moveInputContainer(); // Move o campo de entrada
+        return; // Para a execução do restante do desenho
+      }
 
       drawAbstractShape(input); // Desenha a forma abstrata
 
@@ -324,5 +325,4 @@
   </script>
 </body>
 </html>
-``` 
 

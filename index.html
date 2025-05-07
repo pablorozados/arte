@@ -129,6 +129,29 @@
       }
     }
 
+    // Função para desenhar barras coloridas no fundo
+    function drawBackgroundBars() {
+      const now = new Date();
+      const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+      // Calcula duas cores diferentes
+      const r1 = (secondsInDay * 97) % 256;
+      const g1 = (secondsInDay * 67) % 256;
+      const b1 = (secondsInDay * 43) % 256;
+
+      const r2 = (secondsInDay * 53) % 256;
+      const g2 = (secondsInDay * 89) % 256;
+      const b2 = (secondsInDay * 101) % 256;
+
+      // Desenha a primeira barra
+      ctx.fillStyle = `rgb(${r1}, ${g1}, ${b1})`;
+      ctx.fillRect(0, 0, canvas.width / 4, canvas.height);
+
+      // Desenha a segunda barra
+      ctx.fillStyle = `rgb(${r2}, ${g2}, ${b2})`;
+      ctx.fillRect((canvas.width * 3) / 4, 0, canvas.width / 4, canvas.height);
+    }
+
     // Função para desenhar manchas coloridas
     function drawBlob(x, y, size, colorStart, colorEnd) {
       const gradient = ctx.createRadialGradient(x, y, size / 4, x, y, size);
@@ -161,6 +184,8 @@
       let currentX = canvas.width / 2; // Começa no centro
       let currentY = canvas.height / 2;
 
+      let hasSpecialChar = false; // Verifica se há `!` ou `?`
+
       for (let i = 0; i < input.length; i++) {
         const char = input[i].toLowerCase();
         const size = calculateSize(char); // Calcula o tamanho baseado na vogal
@@ -178,21 +203,25 @@
           drawDots(80); // Desenha 80 pontos coloridos
         }
         // Verifica se é uma sílaba que cria manchas
-        else if (input.slice(i, i + 3) === "cha") {
-          drawBlob(x, y, 100, "rgba(0, 0, 255, 0.8)", "rgba(0, 0, 128, 0.3)"); // Tons de azul
-          i += 2; // Avança o índice para pular a sílaba
-        } else if (input.slice(i, i + 3) === "che") {
-          drawBlob(x, y, 100, "rgba(139, 69, 19, 0.8)", "rgba(160, 82, 45, 0.3)"); // Tons de marrom
+        else if (input.slice(i, i + 3) === "lha" || input.slice(i, i + 3) === "nha") {
+          drawBlob(x, y, 100, "rgba(128, 0, 128, 0.8)", "rgba(75, 0, 130, 0.3)"); // Tons de roxo
           i += 2;
-        } else if (input.slice(i, i + 3) === "chi") {
-          drawBlob(x, y, 100, "rgba(255, 255, 0, 0.8)", "rgba(255, 215, 0, 0.3)"); // Tons de amarelo
+        } else if (input.slice(i, i + 3) === "lhe" || input.slice(i, i + 3) === "nhe") {
+          drawBlob(x, y, 100, "rgba(128, 128, 128, 0.8)", "rgba(169, 169, 169, 0.3)"); // Tons de cinza
           i += 2;
-        } else if (input.slice(i, i + 3) === "cho") {
-          drawBlob(x, y, 100, "rgba(255, 0, 0, 0.8)", "rgba(139, 0, 0, 0.3)"); // Tons de vermelho
+        } else if (input.slice(i, i + 3) === "lhi" || input.slice(i, i + 3) === "nhi") {
+          drawBlob(x, y, 100, "rgba(255, 165, 0, 0.8)", "rgba(255, 140, 0, 0.3)"); // Tons de laranja
           i += 2;
-        } else if (input.slice(i, i + 3) === "chu") {
-          drawBlob(x, y, 100, "rgba(0, 255, 0, 0.8)", "rgba(0, 128, 0, 0.3)"); // Tons de verde
+        } else if (input.slice(i, i + 3) === "lho" || input.slice(i, i + 3) === "nho") {
+          drawBlob(x, y, 100, "rgba(255, 20, 147, 0.8)", "rgba(219, 112, 147, 0.3)"); // Tons de rosa
           i += 2;
+        } else if (input.slice(i, i + 3) === "lhu" || input.slice(i, i + 3) === "nhu") {
+          drawBlob(x, y, 100, "rgba(0, 255, 255, 0.8)", "rgba(0, 139, 139, 0.3)"); // Tons de ciano
+          i += 2;
+        }
+        // Verifica se é um ponto de exclamação ou interrogação
+        else if (char === "!" || char === "?") {
+          hasSpecialChar = true;
         }
         // Verifica se é uma letra acentuada
         else if ("áéíóúâêîôûãõàèìòù".includes(char)) {
@@ -226,6 +255,11 @@
 
         currentX = x;
         currentY = y;
+      }
+
+      // Desenha as barras coloridas no fundo se houver `!` ou `?`
+      if (hasSpecialChar) {
+        drawBackgroundBars();
       }
 
       // Define uma cor aleatória para as linhas

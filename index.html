@@ -58,14 +58,14 @@
 
     // Função para calcular o tamanho baseado na vogal
     function calculateSize(vowel) {
-      const sizes = { a: 30, e: 60, i: 90, o: 120, u: 150 }; // Valores maiores
-      return sizes[vowel] || 30; // Valor padrão caso não seja uma vogal
+      const sizes = { a: 30, e: 60, i: 90, o: 120, u: 150 };
+      return sizes[vowel] || 30;
     }
 
     // Função para calcular a grossura do traço baseado na vogal
     function calculateLineWidth(vowel) {
-      const widths = { a: 2, e: 4, i: 6, o: 8, u: 10 }; // Grossuras diferentes
-      return widths[vowel] || 2; // Valor padrão caso não seja uma vogal
+      const widths = { a: 2, e: 4, i: 6, o: 8, u: 10 };
+      return widths[vowel] || 2;
     }
 
     // Função para calcular a posição determinística com base na letra/sílaba
@@ -79,13 +79,17 @@
     // Função para desenhar formas geométricas
     function drawShape(type, x, y, size) {
       ctx.beginPath();
-      if (type === 'triangle') {
+      if (type === 'circle') {
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+      } else if (type === 'square') {
+        ctx.rect(x - size / 2, y - size / 2, size, size);
+      } else if (type === 'triangle') {
         ctx.moveTo(x, y - size / 2);
         ctx.lineTo(x - size / 2, y + size / 2);
         ctx.lineTo(x + size / 2, y + size / 2);
         ctx.closePath();
       } else if (type === 'polygon') {
-        const sides = 6; // Hexágono
+        const sides = Math.floor(Math.random() * 5) + 3; // Polígono com 3 a 7 lados
         for (let i = 0; i < sides; i++) {
           const angle = (Math.PI * 2 * i) / sides;
           const px = x + Math.cos(angle) * size;
@@ -96,43 +100,35 @@
         ctx.closePath();
       }
       ctx.stroke();
+      ctx.fill();
     }
 
     // Função para desenhar formas personalizadas
     function drawCustomShape(input) {
-      let currentX = canvas.width / 2; // Começa no centro
+      let currentX = canvas.width / 2;
       let currentY = canvas.height / 2;
 
       for (let i = 0; i < input.length; i += 2) {
-        const syllable = input.slice(i, i + 2).toLowerCase(); // Pega duas letras (sílabas)
+        const syllable = input.slice(i, i + 2).toLowerCase();
         const consonant = syllable[0];
         const vowel = syllable[1];
 
-        const size = calculateSize(vowel); // Calcula o tamanho baseado na vogal
-        const lineWidth = calculateLineWidth(vowel); // Calcula a grossura do traço
+        const size = calculateSize(vowel);
+        const lineWidth = calculateLineWidth(vowel);
         ctx.lineWidth = lineWidth;
 
-        if ("bdglnstz".includes(consonant)) {
-          // Sílabas que afetam ctx.moveTo()
-          currentX += size * 2; // Move horizontalmente
-          currentY += size; // Move verticalmente
-          ctx.moveTo(currentX, currentY);
+        const { x, y } = calculatePosition(consonant, i);
 
-          // Adiciona um triângulo
-          drawShape('triangle', currentX, currentY, size);
-        } else if ("cfjkmnpqrvwz".includes(consonant)) {
-          // Sílabas que afetam ctx.lineTo()
-          currentX += size * 2; // Move horizontalmente
-          currentY -= size; // Move verticalmente
-          ctx.lineTo(currentX, currentY);
+        // Escolhe uma forma aleatória para cada sílaba
+        const shapes = ['circle', 'square', 'triangle', 'polygon'];
+        const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
 
-          // Adiciona um polígono
-          drawShape('polygon', currentX, currentY, size);
-        }
+        // Define uma cor aleatória
+        ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`;
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`;
+
+        drawShape(randomShape, x, y, size);
       }
-
-      ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória para a linha
-      ctx.stroke();
     }
 
     // Função para mover o campo de entrada para o canto superior esquerdo

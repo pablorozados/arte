@@ -198,6 +198,21 @@
       ctx.fill();
     }
 
+    // Função para exibir o easter egg
+    function drawEasterEgg() {
+      const message = "Cantando apesar das chamas.";
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
+      ctx.font = "bold 48px Arial"; // Fonte estilizada
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const gradient = ctx.createLinearGradient(0, canvas.height / 2, canvas.width, canvas.height / 2);
+      gradient.addColorStop(0, "red");
+      gradient.addColorStop(0.5, "orange");
+      gradient.addColorStop(1, "yellow");
+      ctx.fillStyle = gradient; // Degradê colorido
+      ctx.fillText(message, canvas.width / 2, canvas.height / 2); // Texto no centro
+    }
+
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
@@ -325,5 +340,4 @@
   </script>
 </body>
 </html>
-``` 
 

@@ -58,8 +58,14 @@
 
     // Função para calcular o tamanho baseado na vogal
     function calculateSize(vowel) {
-      const sizes = { a: 10, e: 20, i: 30, o: 40, u: 50 };
-      return sizes[vowel] || 10; // Valor padrão caso não seja uma vogal
+      const sizes = { a: 30, e: 60, i: 90, o: 120, u: 150 }; // Valores maiores
+      return sizes[vowel] || 30; // Valor padrão caso não seja uma vogal
+    }
+
+    // Função para calcular a grossura do traço baseado na vogal
+    function calculateLineWidth(vowel) {
+      const widths = { a: 2, e: 4, i: 6, o: 8, u: 10 }; // Grossuras diferentes
+      return widths[vowel] || 2; // Valor padrão caso não seja uma vogal
     }
 
     // Função para calcular a posição determinística com base na letra/sílaba
@@ -70,10 +76,30 @@
       return { x, y };
     }
 
+    // Função para desenhar formas geométricas
+    function drawShape(type, x, y, size) {
+      ctx.beginPath();
+      if (type === 'triangle') {
+        ctx.moveTo(x, y - size / 2);
+        ctx.lineTo(x - size / 2, y + size / 2);
+        ctx.lineTo(x + size / 2, y + size / 2);
+        ctx.closePath();
+      } else if (type === 'polygon') {
+        const sides = 6; // Hexágono
+        for (let i = 0; i < sides; i++) {
+          const angle = (Math.PI * 2 * i) / sides;
+          const px = x + Math.cos(angle) * size;
+          const py = y + Math.sin(angle) * size;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      }
+      ctx.stroke();
+    }
+
     // Função para desenhar formas personalizadas
     function drawCustomShape(input) {
-      ctx.beginPath();
-
       let currentX = canvas.width / 2; // Começa no centro
       let currentY = canvas.height / 2;
 
@@ -83,23 +109,39 @@
         const vowel = syllable[1];
 
         const size = calculateSize(vowel); // Calcula o tamanho baseado na vogal
+        const lineWidth = calculateLineWidth(vowel); // Calcula a grossura do traço
+        ctx.lineWidth = lineWidth;
 
         if ("bdglnstz".includes(consonant)) {
           // Sílabas que afetam ctx.moveTo()
           currentX += size * 2; // Move horizontalmente
           currentY += size; // Move verticalmente
           ctx.moveTo(currentX, currentY);
+
+          // Adiciona um triângulo
+          drawShape('triangle', currentX, currentY, size);
         } else if ("cfjkmnpqrvwz".includes(consonant)) {
           // Sílabas que afetam ctx.lineTo()
           currentX += size * 2; // Move horizontalmente
           currentY -= size; // Move verticalmente
           ctx.lineTo(currentX, currentY);
+
+          // Adiciona um polígono
+          drawShape('polygon', currentX, currentY, size);
         }
       }
 
       ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória para a linha
-      ctx.lineWidth = 2;
       ctx.stroke();
+    }
+
+    // Função para mover o campo de entrada para o canto superior esquerdo
+    function moveInputContainer() {
+      const inputContainer = document.getElementById('input-container');
+      inputContainer.style.position = 'absolute';
+      inputContainer.style.top = '10px';
+      inputContainer.style.left = '10px';
+      inputContainer.style.transform = 'none'; // Remove o alinhamento central
     }
 
     // Função para gerar arte
@@ -110,9 +152,11 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
 
       drawCustomShape(input); // Desenha a forma personalizada
+
+      // Move o campo de entrada após o primeiro clique
+      moveInputContainer();
     }
   </script>
 </body>
 </html>
-``` 
 

@@ -1,1 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arte Digital</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: black;
+    }
+    canvas {
+      position: absolute;
+    }
+    #input-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Digite algo..." />
+    <button onclick="generateArt()">Criar Arte</button>
+  </div>
+  <canvas id="art-canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('art-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Função para calcular a cor de fundo com base no segundo atual
+    function setBackgroundColor() {
+      const now = new Date();
+      const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const r = (secondsInDay * 37) % 256;
+      const g = (secondsInDay * 59) % 256;
+      const b = (secondsInDay * 83) % 256;
+      document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Função para criar arte com base no texto do usuário
+    function generateArt() {
+      const input = document.getElementById('user-input').value;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      [...input].forEach((char, index) => {
+        const isVowel = 'aeiouAEIOU'.includes(char);
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * 50 + 10;
+
+        if (isVowel) {
+          // Movimenta formas para quadrantes
+          const quadrant = index % 4;
+          const offsetX = quadrant === 0 || quadrant === 3 ? -100 : 100;
+          const offsetY = quadrant === 0 || quadrant === 1 ? -100 : 100;
+          ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`;
+          ctx.beginPath();
+          ctx.arc(centerX + offsetX, centerY + offsetY, size, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Cria formas geométricas
+          ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`;
+          ctx.fillRect(x, y, size, size);
+        }
+      });
+    }
+
+    // Define a cor de fundo ao carregar a página
+    setBackgroundColor();
+  </script>
+</body>
+</html>
 

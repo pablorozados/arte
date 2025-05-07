@@ -76,59 +76,41 @@
       return { x, y };
     }
 
-    // Função para desenhar formas geométricas
-    function drawShape(type, x, y, size) {
+    // Função para desenhar formas abstratas com linhas
+    function drawAbstractShape(input) {
       ctx.beginPath();
-      if (type === 'circle') {
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-      } else if (type === 'square') {
-        ctx.rect(x - size / 2, y - size / 2, size, size);
-      } else if (type === 'triangle') {
-        ctx.moveTo(x, y - size / 2);
-        ctx.lineTo(x - size / 2, y + size / 2);
-        ctx.lineTo(x + size / 2, y + size / 2);
-        ctx.closePath();
-      } else if (type === 'polygon') {
-        const sides = Math.floor(Math.random() * 5) + 3; // Polígono com 3 a 7 lados
-        for (let i = 0; i < sides; i++) {
-          const angle = (Math.PI * 2 * i) / sides;
-          const px = x + Math.cos(angle) * size;
-          const py = y + Math.sin(angle) * size;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-      }
-      ctx.stroke();
-      ctx.fill();
-    }
 
-    // Função para desenhar formas personalizadas
-    function drawCustomShape(input) {
-      let currentX = canvas.width / 2;
+      let currentX = canvas.width / 2; // Começa no centro
       let currentY = canvas.height / 2;
 
       for (let i = 0; i < input.length; i += 2) {
-        const syllable = input.slice(i, i + 2).toLowerCase();
+        const syllable = input.slice(i, i + 2).toLowerCase(); // Pega duas letras (sílabas)
         const consonant = syllable[0];
         const vowel = syllable[1];
 
-        const size = calculateSize(vowel);
-        const lineWidth = calculateLineWidth(vowel);
+        const size = calculateSize(vowel); // Calcula o tamanho baseado na vogal
+        const lineWidth = calculateLineWidth(vowel); // Calcula a grossura do traço
         ctx.lineWidth = lineWidth;
 
-        const { x, y } = calculatePosition(consonant, i);
+        const { x, y } = calculatePosition(consonant, i); // Posição baseada na sílaba
 
-        // Escolhe uma forma aleatória para cada sílaba
-        const shapes = ['circle', 'square', 'triangle', 'polygon'];
-        const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-
-        // Define uma cor aleatória
-        ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`;
-        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`;
-
-        drawShape(randomShape, x, y, size);
+        // Move ou desenha linhas com base na sílaba
+        if ("bdglnstz".includes(consonant)) {
+          // Sílabas que afetam ctx.moveTo()
+          currentX = x;
+          currentY = y;
+          ctx.moveTo(currentX, currentY);
+        } else if ("cfjkmnpqrvwz".includes(consonant)) {
+          // Sílabas que afetam ctx.lineTo()
+          currentX = x;
+          currentY = y;
+          ctx.lineTo(currentX, currentY);
+        }
       }
+
+      // Define uma cor aleatória para as linhas
+      ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      ctx.stroke();
     }
 
     // Função para mover o campo de entrada para o canto superior esquerdo
@@ -147,7 +129,7 @@
       const input = document.getElementById('user-input').value.toLowerCase();
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
 
-      drawCustomShape(input); // Desenha a forma personalizada
+      drawAbstractShape(input); // Desenha a forma abstrata
 
       // Move o campo de entrada após o primeiro clique
       moveInputContainer();
@@ -155,4 +137,5 @@
   </script>
 </body>
 </html>
+``` 
 

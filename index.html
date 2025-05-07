@@ -46,7 +46,6 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Função para calcular a cor de fundo com base no segundo atual
     function setBackgroundColor() {
       const now = new Date();
       const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
@@ -56,7 +55,16 @@
       document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
     }
 
-    // Função para criar arte com base no texto do usuário
+    function drawTriangle(x, y, size, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.lineTo(x - size / 2, y + size / 2);
+      ctx.lineTo(x + size / 2, y + size / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+
     function generateArt() {
       const input = document.getElementById('user-input').value;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -70,24 +78,32 @@
         const y = Math.random() * canvas.height;
         const size = Math.random() * 50 + 10;
 
+        // Define cores baseadas no caractere
+        const color = isVowel
+          ? `rgba(${Math.random() * 255}, 100, 150, 0.7)` // Tons quentes para vogais
+          : `rgba(100, ${Math.random() * 255}, 200, 0.7)`; // Tons frios para consoantes
+
         if (isVowel) {
-          // Movimenta formas para quadrantes
+          // Movimenta formas para quadrantes e adiciona círculos
           const quadrant = index % 4;
           const offsetX = quadrant === 0 || quadrant === 3 ? -100 : 100;
           const offsetY = quadrant === 0 || quadrant === 1 ? -100 : 100;
-          ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`;
+          ctx.fillStyle = color;
           ctx.beginPath();
           ctx.arc(centerX + offsetX, centerY + offsetY, size, 0, Math.PI * 2);
           ctx.fill();
         } else {
-          // Cria formas geométricas
-          ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`;
-          ctx.fillRect(x, y, size, size);
+          // Alterna entre quadrados e triângulos para consoantes
+          if (index % 2 === 0) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, size, size);
+          } else {
+            drawTriangle(x, y, size, color);
+          }
         }
       });
     }
 
-    // Define a cor de fundo ao carregar a página
     setBackgroundColor();
   </script>
 </body>

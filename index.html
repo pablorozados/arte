@@ -129,6 +129,31 @@
       }
     }
 
+    // Função para desenhar manchas coloridas
+    function drawBlob(x, y, size, colorStart, colorEnd) {
+      const gradient = ctx.createRadialGradient(x, y, size / 4, x, y, size);
+      gradient.addColorStop(0, colorStart);
+      gradient.addColorStop(1, colorEnd);
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+
+      // Criando uma forma irregular para a mancha
+      for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI * 2 * i) / 10;
+        const radius = size + Math.random() * (size / 2) - size / 4;
+        const blobX = x + Math.cos(angle) * radius;
+        const blobY = y + Math.sin(angle) * radius;
+        if (i === 0) {
+          ctx.moveTo(blobX, blobY);
+        } else {
+          ctx.lineTo(blobX, blobY);
+        }
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
@@ -151,6 +176,23 @@
           drawTriangles(21); // Desenha 21 triângulos coloridos
         } else if (char === "k") {
           drawDots(80); // Desenha 80 pontos coloridos
+        }
+        // Verifica se é uma sílaba que cria manchas
+        else if (input.slice(i, i + 3) === "cha") {
+          drawBlob(x, y, 100, "rgba(0, 0, 255, 0.8)", "rgba(0, 0, 128, 0.3)"); // Tons de azul
+          i += 2; // Avança o índice para pular a sílaba
+        } else if (input.slice(i, i + 3) === "che") {
+          drawBlob(x, y, 100, "rgba(139, 69, 19, 0.8)", "rgba(160, 82, 45, 0.3)"); // Tons de marrom
+          i += 2;
+        } else if (input.slice(i, i + 3) === "chi") {
+          drawBlob(x, y, 100, "rgba(255, 255, 0, 0.8)", "rgba(255, 215, 0, 0.3)"); // Tons de amarelo
+          i += 2;
+        } else if (input.slice(i, i + 3) === "cho") {
+          drawBlob(x, y, 100, "rgba(255, 0, 0, 0.8)", "rgba(139, 0, 0, 0.3)"); // Tons de vermelho
+          i += 2;
+        } else if (input.slice(i, i + 3) === "chu") {
+          drawBlob(x, y, 100, "rgba(0, 255, 0, 0.8)", "rgba(0, 128, 0, 0.3)"); // Tons de verde
+          i += 2;
         }
         // Verifica se é uma letra acentuada
         else if ("áéíóúâêîôûãõàèìòù".includes(char)) {

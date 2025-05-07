@@ -200,6 +200,12 @@
 
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
+      // Verifica se o input é "Pablo" para exibir a frase
+      if (input.trim().toLowerCase() === "pablo") {
+        drawEasterEgg();
+        return; // Para a execução do restante do desenho
+      }
+
       ctx.beginPath();
 
       let currentX = canvas.width / 2; // Começa no centro
@@ -264,7 +270,8 @@
             i++;
           }
           drawCircles(parseInt(number)); // Desenha bolinhas para o número
-          i--; // Ajusta o índice
+          i--; // Ajusta o índice para continuar processando o restante da palavra
+          continue; // Continua o loop para processar os próximos caracteres
         }
         // Alterna entre diferentes tipos de linhas e curvas
         else {

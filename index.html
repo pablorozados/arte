@@ -76,6 +76,19 @@
       return { x, y };
     }
 
+    // Função para desenhar bolinhas coloridas
+    function drawCircles(count) {
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * 10 + 5; // Tamanho aleatório entre 5 e 15
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
+        ctx.fill();
+      }
+    }
+
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
@@ -91,15 +104,34 @@
 
         const { x, y } = calculatePosition(char, i); // Posição baseada no caractere
 
+        // Verifica se é uma letra acentuada
+        if ("áéíóúâêîôûãõàèìòù".includes(char)) {
+          ctx.moveTo(x, y);
+          ctx.arc(x, y, size / 4, 0, Math.PI * 2); // Desenha um pequeno círculo
+          ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
+          ctx.fill();
+        }
+        // Verifica se é um número
+        else if (!isNaN(char) && char !== " ") {
+          let number = "";
+          while (i < input.length && !isNaN(input[i]) && input[i] !== " ") {
+            number += input[i];
+            i++;
+          }
+          drawCircles(parseInt(number)); // Desenha bolinhas para o número
+          i--; // Ajusta o índice
+        }
         // Alterna entre diferentes tipos de linhas e curvas
-        if (i % 3 === 0) {
-          ctx.lineTo(x, y); // Linha reta
-        } else if (i % 3 === 1) {
-          ctx.quadraticCurveTo(currentX, currentY, x, y); // Curva quadrática
-        } else {
-          const controlX = (currentX + x) / 2 + Math.random() * size - size / 2;
-          const controlY = (currentY + y) / 2 + Math.random() * size - size / 2;
-          ctx.bezierCurveTo(controlX, controlY, x, y, x + size / 2, y + size / 2); // Curva Bézier
+        else {
+          if (i % 3 === 0) {
+            ctx.lineTo(x, y); // Linha reta
+          } else if (i % 3 === 1) {
+            ctx.quadraticCurveTo(currentX, currentY, x, y); // Curva quadrática
+          } else {
+            const controlX = (currentX + x) / 2 + Math.random() * size - size / 2;
+            const controlY = (currentY + y) / 2 + Math.random() * size - size / 2;
+            ctx.bezierCurveTo(controlX, controlY, x, y, x + size / 2, y + size / 2); // Curva Bézier
+          }
         }
 
         currentX = x;

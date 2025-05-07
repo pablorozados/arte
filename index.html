@@ -46,17 +46,23 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Mapeamento de letras/sílabas para formas
-    const shapeMap = {
-      a: 'circle',
-      b: 'square',
-      c: 'triangle',
-      ba: 'star',
-      ca: 'hexagon',
-      // Adicione mais mapeamentos aqui
-    };
+    // Função para calcular e definir a cor de fundo
+    function setBackgroundColor() {
+      const now = new Date();
+      const secondsInDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const r = (secondsInDay * 37) % 256;
+      const g = (secondsInDay * 59) % 256;
+      const b = (secondsInDay * 83) % 256;
+      document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    }
 
-    // Função para calcular uma posição determinística com base na letra/sílaba
+    // Função para calcular o tamanho baseado na vogal
+    function calculateSize(vowel) {
+      const sizes = { a: 10, e: 20, i: 30, o: 40, u: 50 };
+      return sizes[vowel] || 10; // Valor padrão caso não seja uma vogal
+    }
+
+    // Função para calcular a posição determinística com base na letra/sílaba
     function calculatePosition(char, index) {
       const hash = char.charCodeAt(0) + index * 31;
       const x = (hash % canvas.width);
@@ -64,77 +70,49 @@
       return { x, y };
     }
 
-    // Função para desenhar formas
-    function drawShape(type, x, y, size, color) {
-      ctx.fillStyle = color;
+    // Função para desenhar formas personalizadas
+    function drawCustomShape(input) {
       ctx.beginPath();
-      if (type === 'circle') {
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-      } else if (type === 'square') {
-        ctx.rect(x - size / 2, y - size / 2, size, size);
-      } else if (type === 'triangle') {
-        ctx.moveTo(x, y - size / 2);
-        ctx.lineTo(x - size / 2, y + size / 2);
-        ctx.lineTo(x + size / 2, y + size / 2);
-        ctx.closePath();
-      } else if (type === 'star') {
-        for (let i = 0; i < 5; i++) {
-          const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-          const outerX = x + Math.cos(angle) * size;
-          const outerY = y + Math.sin(angle) * size;
-          ctx.lineTo(outerX, outerY);
-          const innerAngle = angle + Math.PI / 5;
-          const innerX = x + Math.cos(innerAngle) * (size / 2);
-          const innerY = y + Math.sin(innerAngle) * (size / 2);
-          ctx.lineTo(innerX, innerY);
+
+      let currentX = canvas.width / 2; // Começa no centro
+      let currentY = canvas.height / 2;
+
+      for (let i = 0; i < input.length; i += 2) {
+        const syllable = input.slice(i, i + 2).toLowerCase(); // Pega duas letras (sílabas)
+        const consonant = syllable[0];
+        const vowel = syllable[1];
+
+        const size = calculateSize(vowel); // Calcula o tamanho baseado na vogal
+
+        if ("bdglnstz".includes(consonant)) {
+          // Sílabas que afetam ctx.moveTo()
+          currentX += size * 2; // Move horizontalmente
+          currentY += size; // Move verticalmente
+          ctx.moveTo(currentX, currentY);
+        } else if ("cfjkmnpqrvwz".includes(consonant)) {
+          // Sílabas que afetam ctx.lineTo()
+          currentX += size * 2; // Move horizontalmente
+          currentY -= size; // Move verticalmente
+          ctx.lineTo(currentX, currentY);
         }
-        ctx.closePath();
-      } else if (type === 'hexagon') {
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI * 2 * i) / 6;
-          const hexX = x + Math.cos(angle) * size;
-          const hexY = y + Math.sin(angle) * size;
-          if (i === 0) ctx.moveTo(hexX, hexY);
-          else ctx.lineTo(hexX, hexY);
-        }
-        ctx.closePath();
       }
-      ctx.fill();
+
+      ctx.strokeStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória para a linha
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
     // Função para gerar arte
     function generateArt() {
+      setBackgroundColor(); // Atualiza a cor de fundo
+
       const input = document.getElementById('user-input').value.toLowerCase();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
 
-      let index = 0;
-      while (index < input.length) {
-        let match = null;
-
-        // Verifica se há uma sílaba correspondente
-        for (const key in shapeMap) {
-          if (input.startsWith(key, index)) {
-            match = key;
-            break;
-          }
-        }
-
-        // Se não houver sílaba correspondente, usa a letra
-        if (!match) {
-          match = input[index];
-        }
-
-        const shapeType = shapeMap[match] || 'circle'; // Forma padrão: círculo
-        const { x, y } = calculatePosition(match, index);
-        const size = 30 + (match.length * 10); // Tamanho baseado no comprimento da sílaba/letra
-        const color = `hsl(${(match.charCodeAt(0) * 37) % 360}, 70%, 60%)`; // Cor baseada no código da letra
-
-        drawShape(shapeType, x, y, size, color);
-
-        index += match.length; // Avança o índice pelo comprimento da sílaba/letra
-      }
+      drawCustomShape(input); // Desenha a forma personalizada
     }
   </script>
 </body>
 </html>
+``` 
 

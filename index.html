@@ -89,6 +89,46 @@
       }
     }
 
+    // Função para desenhar quadrados coloridos
+    function drawSquares(count) {
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * 20 + 10; // Tamanho aleatório entre 10 e 30
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
+        ctx.fillRect(x, y, size, size);
+      }
+    }
+
+    // Função para desenhar triângulos coloridos
+    function drawTriangles(count) {
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * 20 + 10; // Tamanho aleatório entre 10 e 30
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
+        ctx.beginPath();
+        ctx.moveTo(x, y - size / 2);
+        ctx.lineTo(x - size / 2, y + size / 2);
+        ctx.lineTo(x + size / 2, y + size / 2);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // Função para desenhar pontos coloridos
+    function drawDots(count) {
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * 5 + 2; // Tamanho aleatório entre 2 e 7
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
+        ctx.fill();
+      }
+    }
+
     // Função para desenhar formas abstratas com linhas e curvas
     function drawAbstractShape(input) {
       ctx.beginPath();
@@ -104,8 +144,16 @@
 
         const { x, y } = calculatePosition(char, i); // Posição baseada no caractere
 
+        // Verifica se é uma letra especial
+        if (char === "w") {
+          drawSquares(21); // Desenha 21 quadrados coloridos
+        } else if (char === "y") {
+          drawTriangles(21); // Desenha 21 triângulos coloridos
+        } else if (char === "k") {
+          drawDots(80); // Desenha 80 pontos coloridos
+        }
         // Verifica se é uma letra acentuada
-        if ("áéíóúâêîôûãõàèìòù".includes(char)) {
+        else if ("áéíóúâêîôûãõàèìòù".includes(char)) {
           ctx.moveTo(x, y);
           ctx.arc(x, y, size / 4, 0, Math.PI * 2); // Desenha um pequeno círculo
           ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 60%)`; // Cor aleatória
